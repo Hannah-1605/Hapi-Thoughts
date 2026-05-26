@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — Hapi Vet{% endblock %}
+{% block content %}
+<!-- Pet owner dashboard placeholder -->
+<div class="dashboard-page">
+  <h1>Pet Owner Dashboard</h1>
+  <p>Logged in as: {{ request.user.email }}</p>
+  <a href="{% url 'logout' %}">Logout</a>
+</div>
+{% endblock %}

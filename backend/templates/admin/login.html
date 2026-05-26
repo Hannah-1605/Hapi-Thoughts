@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Login — Hapi Vet{% endblock %}
+
+{% block content %}
+<!-- Admin login page -->
+<div class="login-page">
+
+  <div class="login-card">
+
+    <!-- Clinic branding -->
+    <div class="login-header">
+      <h1 class="clinic-name">Hapi Vet</h1>
+      <p class="clinic-tagline">Admin Access</p>
+    </div>
+
+    <!-- Flash messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Admin login form -->
+    <form method="POST" action="{% url 'admin_login' %}">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value="{{ email|default:'' }}"
+          placeholder="admin@hapivet.com"
+          required
+          autofocus
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Your password"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn-primary">
+        Sign In as Admin
+      </button>
+
+    </form>
+
+    <!-- Back to pet owner login -->
+    <div class="admin-login-link">
+      <a href="{% url 'owner_login' %}">← Back to pet owner login</a>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

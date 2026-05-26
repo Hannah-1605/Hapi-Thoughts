@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — Hapi Vet{% endblock %}
+{% block content %}
+<!-- Admin dashboard placeholder -->
+<div class="dashboard-page">
+  <h1>Admin Dashboard</h1>
+  <p>Logged in as: {{ request.user.email }}</p>
+  <a href="{% url 'logout' %}">Logout</a>
+</div>
+{% endblock %}

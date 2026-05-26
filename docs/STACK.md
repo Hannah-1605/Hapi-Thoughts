@@ -11,7 +11,7 @@
 | Layer | Technology | Version |
 |---|---|---|
 | Language | Python | 3.10.11 |
-| Framework | Django | 5.1.7 |
+| Framework | Django | 5.2.12 |
 | Database | PostgreSQL | port 5432 |
 | Styling | Tailwind CSS | CDN (Phase 1) → django-tailwind (Phase 2) |
 | Template Engine | Django Templates | built-in |

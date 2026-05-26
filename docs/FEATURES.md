@@ -37,16 +37,16 @@ Phase 7 — Dashboards & Polish
 ### 1.1 Django Project Setup
 | Feature | Status |
 |---|---|
-| Django project initialized | `planned` |
-| PostgreSQL connected locally | `planned` |
-| Custom user model (`AbstractUser`) created | `planned` |
-| Role field (`ADMIN` / `PET_OWNER`) on User model | `planned` |
-| Base template created with Tailwind CDN | `planned` |
-| HTMX loaded via CDN | `planned` |
-| `.env` file configured with `django-environ` | `planned` |
-| `accounts` app created | `planned` |
-| django-allauth installed and configured | `planned` |
-| Google OAuth credentials configured | `planned` |
+| Django project initialized | `complete ` |
+| PostgreSQL connected locally | `complete ` |
+| Custom user model (`AbstractUser`) created | `complete ` |
+| Role field (`ADMIN` / `PET_OWNER`) on User model | `complete ` |
+| Base template created with Tailwind CDN | `complete ` |
+| HTMX loaded via CDN | `complete ` |
+| `.env` file configured with `django-environ` | `complete ` |
+| `accounts` app created | `complete ` |
+| django-allauth installed and configured | `complete ` |
+| Google OAuth credentials configured | `complete ` |
 
 ### 1.2 Authentication — Pet Owner
 | Feature | Status |

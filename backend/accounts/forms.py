@@ -37,8 +37,16 @@ class PetOwnerRegistrationForm(forms.ModelForm):
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
 
-        if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("Passwords do not match.")
+        if password1 and password2:
+            if password1 != password2:
+                raise forms.ValidationError("Passwords do not match.")
+
+            # Run Django's built-in password validators
+            from django.contrib.auth.password_validation import validate_password
+            try:
+                validate_password(password1)
+            except forms.ValidationError as e:
+                self.add_error("password1", e)
 
         return cleaned_data
 

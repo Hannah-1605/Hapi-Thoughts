@@ -57,6 +57,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",  # required by allauth
+    "accounts.middleware.RoleAccessMiddleware",
 ]
 
 ROOT_URLCONF = "hapivet.urls"

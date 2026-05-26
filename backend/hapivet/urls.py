@@ -1,8 +1,44 @@
 from django.urls import path, include
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    # accounts (login, register, etc.)
+    # accounts (login, register, verification, dashboards)
     path("", include("accounts.urls")),
+
     # allauth (Google OAuth, email verification, etc.)
     path("accounts/", include("allauth.urls")),
+
+    # ─── Password Reset (Django built-in views) ───────────────────────────
+    path(
+        "forgot-password/",
+        auth_views.PasswordResetView.as_view(
+            template_name="owner/forgot_password.html",
+            email_template_name="owner/emails/password_reset_email.txt",
+            subject_template_name="owner/emails/password_reset_subject.txt",
+            success_url="/forgot-password/sent/",
+        ),
+        name="forgot_password",
+    ),
+    path(
+        "forgot-password/sent/",
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="owner/forgot_password_sent.html",
+        ),
+        name="password_reset_done",
+    ),
+    path(
+        "reset-password/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="owner/reset_password.html",
+            success_url="/reset-password/complete/",
+        ),
+        name="password_reset_confirm",
+    ),
+    path(
+        "reset-password/complete/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="owner/reset_password_complete.html",
+        ),
+        name="password_reset_complete",
+    ),
 ]

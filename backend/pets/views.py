@@ -7,6 +7,11 @@ from django.shortcuts import redirect, render
 from .forms import ContactLinkFormSet, PetForm, PetOwnerProfileForm
 from .models import PetOwner
 
+from .forms import ContactLinkFormSet, PetDeletionRequestForm, PetForm, PetOwnerProfileForm
+from .models import Pet, PetDeletionRequest, PetOwner
+
+from django.shortcuts import get_object_or_404, redirect, render
+
 
 def _require_pet_owner(request):
     """
@@ -250,3 +255,237 @@ def owner_profile_edit(request):
             "pet_owner": pet_owner,
         },
     )
+
+
+# ---------------------------------------------------------------------------
+# Pets — List
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def owner_pet_list(request):
+    guard = _require_pet_owner(request)
+    if guard:
+        return guard
+
+    pet_owner = get_object_or_404(PetOwner, user=request.user)
+
+    # Only show active (non-archived) pets
+    pets = Pet.objects.filter(owner=pet_owner, is_archived=False)
+
+    # Check which pets have a pending deletion request
+    # Used in template to show the "Pending deletion" badge
+    pending_deletion_pks = set(
+        PetDeletionRequest.objects.filter(
+            pet__in=pets,
+            status=PetDeletionRequest.PENDING,
+        ).values_list("pet_id", flat=True)
+    )
+
+    return render(
+        request,
+        "owner/pets/list.html",
+        {
+            "pets": pets,
+            "pending_deletion_pks": pending_deletion_pks,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Pets — Detail
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def owner_pet_detail(request, pk):
+    guard = _require_pet_owner(request)
+    if guard:
+        return guard
+
+    pet_owner = get_object_or_404(PetOwner, user=request.user)
+
+    # Ensure the pet belongs to this owner
+    pet = get_object_or_404(Pet, pk=pk, owner=pet_owner, is_archived=False)
+
+    # Check for a pending deletion request on this pet
+    pending_deletion = PetDeletionRequest.objects.filter(
+        pet=pet,
+        status=PetDeletionRequest.PENDING,
+    ).first()
+
+    return render(
+        request,
+        "owner/pets/detail.html",
+        {
+            "pet": pet,
+            "pending_deletion": pending_deletion,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Pets — Add
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def owner_pet_add(request):
+    guard = _require_pet_owner(request)
+    if guard:
+        return guard
+
+    pet_owner = get_object_or_404(PetOwner, user=request.user)
+
+    if request.method == "POST":
+        form = PetForm(request.POST, request.FILES)
+        if form.is_valid():
+            pet = form.save(commit=False)
+            pet.owner = pet_owner
+            pet.save()
+            messages.success(request, f"{pet.name} has been added.")
+            return redirect("owner_pet_detail", pk=pet.pk)
+
+    else:
+        form = PetForm()
+
+    return render(
+        request,
+        "owner/pets/add.html",
+        {
+            "form": form,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Pets — Edit
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def owner_pet_edit(request, pk):
+    guard = _require_pet_owner(request)
+    if guard:
+        return guard
+
+    pet_owner = get_object_or_404(PetOwner, user=request.user)
+    pet = get_object_or_404(Pet, pk=pk, owner=pet_owner, is_archived=False)
+
+    # Block editing if a deletion request is pending
+    pending_deletion = PetDeletionRequest.objects.filter(
+        pet=pet,
+        status=PetDeletionRequest.PENDING,
+    ).first()
+    if pending_deletion:
+        messages.warning(
+            request,
+            "You cannot edit a pet while a deletion request is pending.",
+        )
+        return redirect("owner_pet_detail", pk=pet.pk)
+
+    if request.method == "POST":
+        form = PetForm(request.POST, request.FILES, instance=pet)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"{pet.name} has been updated.")
+            return redirect("owner_pet_detail", pk=pet.pk)
+
+    else:
+        form = PetForm(instance=pet)
+
+    return render(
+        request,
+        "owner/pets/edit.html",
+        {
+            "form": form,
+            "pet": pet,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Pets — Deletion Request
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def owner_pet_delete_request(request, pk):
+    guard = _require_pet_owner(request)
+    if guard:
+        return guard
+
+    pet_owner = get_object_or_404(PetOwner, user=request.user)
+    pet = get_object_or_404(Pet, pk=pk, owner=pet_owner, is_archived=False)
+
+    # Prevent duplicate pending requests
+    existing_request = PetDeletionRequest.objects.filter(
+        pet=pet,
+        status=PetDeletionRequest.PENDING,
+    ).first()
+    if existing_request:
+        messages.warning(
+            request,
+            "A deletion request for this pet is already pending.",
+        )
+        return redirect("owner_pet_detail", pk=pet.pk)
+
+    if request.method == "POST":
+        form = PetDeletionRequestForm(request.POST)
+        if form.is_valid():
+            deletion_request = form.save(commit=False)
+            deletion_request.pet = pet
+            deletion_request.requested_by = request.user
+            deletion_request.status = PetDeletionRequest.PENDING
+            deletion_request.save()
+            messages.success(
+                request,
+                f"Deletion request for {pet.name} has been submitted. "
+                "The clinic will review your request.",
+            )
+            return redirect("owner_pet_detail", pk=pet.pk)
+
+    else:
+        form = PetDeletionRequestForm()
+
+    return render(
+        request,
+        "owner/pets/delete_request.html",
+        {
+            "form": form,
+            "pet": pet,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Pets — Cancel Deletion Request
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def owner_pet_cancel_delete_request(request, pk):
+    guard = _require_pet_owner(request)
+    if guard:
+        return guard
+
+    pet_owner = get_object_or_404(PetOwner, user=request.user)
+    pet = get_object_or_404(Pet, pk=pk, owner=pet_owner, is_archived=False)
+
+    # Only allow cancelling PENDING requests
+    deletion_request = get_object_or_404(
+        PetDeletionRequest,
+        pet=pet,
+        requested_by=request.user,
+        status=PetDeletionRequest.PENDING,
+    )
+
+    # Only process on POST — prevents accidental cancellation via GET
+    if request.method == "POST":
+        deletion_request.delete()
+        messages.success(
+            request,
+            f"Deletion request for {pet.name} has been cancelled.",
+        )
+
+    return redirect("owner_pet_detail", pk=pet.pk)

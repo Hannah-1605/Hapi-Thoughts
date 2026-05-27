@@ -206,6 +206,7 @@ Use `django-environ` or `python-decouple` to load these in `settings.py`.
 | **Supabase** | PostgreSQL database hosting | Free, permanent, no expiry |
 | **UptimeRobot** | Prevents Render cold starts | Free |
 | **GitHub** | Code repository + deploy trigger | Free |
+| **Cloudinary** | Media file storage (profile photos, pet photos, test results) | Free tier |
 
 ### Why This Setup
 - Render's free PostgreSQL expires after 30 days — so we use Supabase for the
@@ -214,6 +215,8 @@ Use `django-environ` or `python-decouple` to load these in `settings.py`.
 - UptimeRobot pings the app every 10 minutes to prevent the 15-minute sleep
   (cold start) on Render's free tier
 - Total cost: ₱0 with no expiry issues
+- Media files are stored on Cloudinary in production.
+Local development still uses Django's local media serving (DEBUG=True).
 
 ### How They Connect
 ```

@@ -63,22 +63,22 @@ Phase 7 — Dashboards & Polish
 ### 1.3 Authentication — Admin
 | Feature | Status |
 |---|---|
-| Separate admin login page (`/admin-login/`) | `planned` |
-| Initial credentials set via Django management command | `planned` |
-| Admin logs in with username + password | `planned` |
+| Separate admin login page (`/admin-login/`) | `complete` |
+| Initial credentials set via Django management command | `complete` |
+| Admin logs in with username + password | `complete` |
 | Admin can link Google account in profile settings | `planned` |
 | Admin can use Google sign-in after linking | `planned` |
-| Forgot password / reset password | `planned` |
-| Redirect to admin dashboard after login | `planned` |
+| Forgot password / reset password | `complete` |
+| Redirect to admin dashboard after login | `complete` |
 
 ### 1.4 Access Control
 | Feature | Status |
 |---|---|
-| Role-based access control enforced on all views | `planned` |
-| Login required middleware for all protected routes | `planned` |
-| Pet Owner cannot access admin views | `planned` |
-| Admin cannot access pet owner views | `planned` |
-| Separate login URLs for each role | `planned` |
+| Role-based access control enforced on all views | `complete` |
+| Login required middleware for all protected routes | `complete` |
+| Pet Owner cannot access admin views | `complete` |
+| Admin cannot access pet owner views | `complete` |
+| Separate login URLs for each role | `complete` |
 
 ---
 
@@ -87,23 +87,23 @@ Phase 7 — Dashboards & Polish
 ### 2.1 Onboarding Flow (First Login)
 | Feature | Status |
 |---|---|
-| Onboarding triggered after first login | `planned` |
-| Step 1 — Enter basic profile info (name, contact number) | `planned` |
-| Step 1 — Optional profile photo upload | `planned` |
-| Step 1 — Optional contact links (Facebook, other socials) | `planned` |
-| Step 2 — Add first pet (name, species, breed, date of birth) | `planned` |
-| Option to skip pet addition and add later | `planned` |
-| Option to add multiple pets during onboarding | `planned` |
-| Redirect to Pet Owner dashboard after onboarding | `planned` |
+| Onboarding triggered after first login | `complete` |
+| Step 1 — Enter basic profile info (name, contact number) | `complete` |
+| Step 1 — Optional profile photo upload | `complete` |
+| Step 1 — Optional contact links (Facebook, other socials) | `complete` |
+| Step 2 — Add first pet (name, species, breed, date of birth) | `complete` |
+| Option to skip pet addition and add later | `complete` |
+| Option to add multiple pets during onboarding | `complete` |
+| Redirect to Pet Owner dashboard after onboarding | `complete` |
 
 ### 2.2 Pet Owner Profile
 | Feature | Status |
 |---|---|
-| View own profile | `planned` |
-| Edit profile (name, address, contact number, email) | `planned` |
+| View own profile | `complete` |
+| Edit profile (name, address, contact number, email) | `complete` |
 | Edit contact links (Facebook, other socials) | `planned` |
-| Profile photo upload (optional) | `planned` |
-| Auto-generated initials avatar if no photo uploaded | `planned` |
+| Profile photo upload (optional) | `complete` |
+| Auto-generated initials avatar if no photo uploaded | `complete` |
 | Notification preferences settings | `planned` |
 | Appointment reminder timing preference | `planned` |
 | Vaccination reminder timing preference (days in advance) | `planned` |

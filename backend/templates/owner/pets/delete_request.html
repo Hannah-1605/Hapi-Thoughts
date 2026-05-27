@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Deletion — {{ pet.name }} — Hapi Vet{% endblock %}
+
+{% block content %}
+
+<div class="delete-request-page">
+
+  <div class="delete-request-header">
+    <h1 class="delete-request-title">Request Deletion of {{ pet.name }}</h1>
+    <a href="{% url 'owner_pet_detail' pet.pk %}" class="btn-secondary">Cancel</a>
+  </div>
+
+  <!-- Warning message -->
+  <div class="delete-request-warning">
+    <p>
+      This will send a deletion request to the clinic for review.
+      {{ pet.name }} will remain visible in your account until the request is approved.
+      You can cancel this request at any time while it is still pending.
+    </p>
+  </div>
+
+  <form method="post" class="delete-request-form">
+    {% csrf_token %}
+
+    <div class="form-section">
+      <label class="form-label" for="{{ form.reason.id_for_label }}">
+        Reason <span class="required-tag">*</span>
+      </label>
+      {{ form.reason }}
+      {% if form.reason.errors %}
+        <p class="form-error">{{ form.reason.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    <div class="form-section">
+      <label class="form-label" for="{{ form.reason_detail.id_for_label }}">
+        Additional Details
+        <span class="optional-tag">(required if Other is selected)</span>
+      </label>
+      {{ form.reason_detail }}
+      {% if form.reason_detail.errors %}
+        <p class="form-error">{{ form.reason_detail.errors.0 }}</p>
+      {% endif %}
+      {% if form.non_field_errors %}
+        <p class="form-error">{{ form.non_field_errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'owner_pet_detail' pet.pk %}" class="btn-secondary">
+        Cancel
+      </a>
+      <button type="submit" class="btn-danger">
+        Submit Deletion Request
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+{% endblock %}

@@ -5,6 +5,9 @@ from django.forms import formset_factory
 
 from .models import ContactLink, Pet, PetOwner
 
+from .models import ContactLink, Pet, PetDeletionRequest, PetOwner
+
+
 
 class PetOwnerProfileForm(forms.ModelForm):
     class Meta:
@@ -180,3 +183,30 @@ class PetForm(forms.ModelForm):
         if dob and dob > timezone.now().date():
             raise forms.ValidationError("Date of birth cannot be in the future.")
         return dob
+    
+class PetDeletionRequestForm(forms.ModelForm):
+    class Meta:
+        model = PetDeletionRequest
+        fields = ["reason", "reason_detail"]
+        widgets = {
+            "reason": forms.Select(),
+            "reason_detail": forms.Textarea(
+                attrs={
+                    "rows": 3,
+                    "placeholder": "Please describe the reason (required if Other is selected)",
+                }
+            ),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        reason = cleaned_data.get("reason")
+        reason_detail = cleaned_data.get("reason_detail", "").strip()
+
+        # If reason is OTHER, detail is required
+        if reason == PetDeletionRequest.OTHER and not reason_detail:
+            raise forms.ValidationError(
+                "Please provide details when selecting Other as the reason."
+            )
+
+        return cleaned_data

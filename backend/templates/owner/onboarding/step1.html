@@ -1,0 +1,197 @@
+<!-- templates/owner/onboarding/step1.html -->
+{% extends 'base.html' %}
+
+{% block title %}Set Up Your Profile — Hapi Vet{% endblock %}
+
+{% block content %}
+
+<!-- Onboarding wrapper — full screen centered layout -->
+<div class="onboarding-page">
+
+  <!-- Card container -->
+  <div class="onboarding-card">
+
+    <!-- Header -->
+    <div class="onboarding-header">
+      <h1 class="onboarding-title">Welcome to Hapi Vet</h1>
+      <p class="onboarding-subtitle">Let's set up your profile before we get started.</p>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+      <div class="step-item step-active">
+        <span class="step-number">1</span>
+        <span class="step-label">Your Profile</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step-item step-inactive">
+        <span class="step-number">2</span>
+        <span class="step-label">Your Pet</span>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form method="post" enctype="multipart/form-data" class="onboarding-form">
+      {% csrf_token %}
+
+      <!-- Profile photo upload -->
+      <div class="form-section">
+        <label class="form-label">Profile Photo <span class="optional-tag">(optional)</span></label>
+        {{ profile_form.profile_photo }}
+        {% if profile_form.profile_photo.errors %}
+          <p class="form-error">{{ profile_form.profile_photo.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Name row — first and last side by side -->
+      <div class="form-row-two-col">
+
+        <div class="form-section">
+          <label class="form-label" for="{{ profile_form.first_name.id_for_label }}">
+            First Name <span class="required-tag">*</span>
+          </label>
+          {{ profile_form.first_name }}
+          {% if profile_form.first_name.errors %}
+            <p class="form-error">{{ profile_form.first_name.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="{{ profile_form.last_name.id_for_label }}">
+            Last Name <span class="required-tag">*</span>
+          </label>
+          {{ profile_form.last_name }}
+          {% if profile_form.last_name.errors %}
+            <p class="form-error">{{ profile_form.last_name.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- Contact number -->
+      <div class="form-section">
+        <label class="form-label" for="{{ profile_form.contact_number.id_for_label }}">
+          Contact Number <span class="optional-tag">(optional)</span>
+        </label>
+        {{ profile_form.contact_number }}
+        {% if profile_form.contact_number.errors %}
+          <p class="form-error">{{ profile_form.contact_number.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Address 
+      <div class="form-section">
+        <label class="form-label" for="{{ profile_form.address.id_for_label }}">
+          Address <span class="optional-tag">(optional)</span>
+        </label>
+        {{ profile_form.address }}
+        {% if profile_form.address.errors %}
+          <p class="form-error">{{ profile_form.address.errors.0 }}</p>
+        {% endif %}
+      </div>  -->
+
+      <!-- Address section — structured Philippine address fields -->
+      <div class="form-section">
+        <label class="form-label">
+          Address <span class="optional-tag">(optional)</span>
+        </label>
+
+      <!-- Address line — full width -->
+      <div class="address-line-field">
+        {{ profile_form.address_line }}
+        {% if profile_form.address_line.errors %}
+          <p class="form-error">{{ profile_form.address_line.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Barangay and City/Municipality side by side -->
+      <div class="form-row-two-col">
+
+        <div class="address-field">
+          <label class="form-label-sub" for="{{ profile_form.barangay.id_for_label }}">
+            Barangay
+          </label>
+          {{ profile_form.barangay }}
+          {% if profile_form.barangay.errors %}
+            <p class="form-error">{{ profile_form.barangay.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="address-field">
+          <label class="form-label-sub" for="{{ profile_form.city_municipality.id_for_label }}">
+            City / Municipality
+          </label>
+          {{ profile_form.city_municipality }}
+          {% if profile_form.city_municipality.errors %}
+            <p class="form-error">{{ profile_form.city_municipality.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- Province — full width -->
+      <div class="address-field">
+        <label class="form-label-sub" for="{{ profile_form.province.id_for_label }}">
+          Province
+        </label>
+        {{ profile_form.province }}
+        {% if profile_form.province.errors %}
+          <p class="form-error">{{ profile_form.province.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+      <!-- Contact links section -->
+      <div class="form-section">
+        <label class="form-label">
+          Social / Contact Links <span class="optional-tag">(optional)</span>
+        </label>
+        <p class="form-hint">Add Facebook, Instagram, or any other contact link.</p>
+
+        <!-- Formset management form — required by Django, do not remove -->
+        {{ link_formset.management_form }}
+
+        <!-- Contact link rows -->
+        <div class="contact-links-list">
+          {% for link_form in link_formset %}
+            <div class="contact-link-row">
+
+              <div class="contact-link-platform">
+                {{ link_form.platform }}
+                {% if link_form.platform.errors %}
+                  <p class="form-error">{{ link_form.platform.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <div class="contact-link-handle">
+                {{ link_form.url_or_handle }}
+                {% if link_form.url_or_handle.errors %}
+                  <p class="form-error">{{ link_form.url_or_handle.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+              <!-- Non-field errors on this row (e.g. one field filled without the other) -->
+              {% if link_form.non_field_errors %}
+                <p class="form-error">{{ link_form.non_field_errors.0 }}</p>
+              {% endif %}
+
+            </div>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      <!-- Submit -->
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          Continue to Step 2 →
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

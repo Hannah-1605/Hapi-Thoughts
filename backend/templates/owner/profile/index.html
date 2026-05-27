@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile — Hapi Vet{% endblock %}
+
+{% block content %}
+
+<div class="profile-page">
+
+  <!-- Page header -->
+  <div class="profile-header">
+    <h1 class="profile-title">My Profile</h1>
+    <a href="{% url 'owner_profile_edit' %}" class="btn-primary">
+      Edit Profile
+    </a>
+  </div>
+
+  <div class="profile-content">
+
+    <!-- Left column — photo + name -->
+    <div class="profile-sidebar">
+
+      <!-- Profile photo or initials avatar -->
+      <div class="profile-avatar-wrapper">
+        {% if pet_owner.profile_photo %}
+          <img
+            src="{{ pet_owner.profile_photo.url }}"
+            alt="{{ pet_owner.full_name }}"
+            class="profile-avatar-photo"
+          />
+        {% else %}
+          <!-- Initials avatar — shows first letter of first + last name -->
+          <div class="profile-avatar-initials">
+            <span>{{ pet_owner.first_name|first|upper }}{{ pet_owner.last_name|first|upper }}</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <h2 class="profile-full-name">{{ pet_owner.full_name }}</h2>
+      <p class="profile-email">{{ request.user.email }}</p>
+      <p class="profile-since">
+        Member since {{ pet_owner.date_registered|date:"F Y" }}
+      </p>
+
+    </div>
+
+    <!-- Right column — details -->
+    <div class="profile-details">
+
+      <!-- Contact info section -->
+      <div class="profile-section">
+        <h3 class="profile-section-title">Contact Information</h3>
+
+        <div class="profile-field">
+          <span class="profile-field-label">Contact Number</span>
+          <span class="profile-field-value">
+            {{ pet_owner.contact_number|default:"Not provided" }}
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Address section -->
+      <div class="profile-section">
+        <h3 class="profile-section-title">Address</h3>
+
+        {% if pet_owner.full_address %}
+          <p class="profile-address">{{ pet_owner.full_address }}</p>
+        {% else %}
+          <p class="profile-field-empty">No address provided.</p>
+        {% endif %}
+
+      </div>
+
+      <!-- Social links section -->
+      <div class="profile-section">
+        <h3 class="profile-section-title">Social / Contact Links</h3>
+
+        {% if contact_links %}
+          <ul class="profile-links-list">
+            {% for link in contact_links %}
+              <li class="profile-link-item">
+                <span class="profile-link-platform">{{ link.platform }}</span>
+                <span class="profile-link-handle">{{ link.url_or_handle }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="profile-field-empty">No links added.</p>
+        {% endif %}
+
+      </div>
+
+      <!-- Notification preferences stub — wired up in Phase 6 -->
+      <div class="profile-section">
+        <h3 class="profile-section-title">Notification Preferences</h3>
+        <p class="profile-field-empty">
+          Notification settings will be available here soon.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}

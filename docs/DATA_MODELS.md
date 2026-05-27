@@ -92,7 +92,10 @@ One-to-one relationship with User.
 | `first_name` | CharField | max_length=50 | — |
 | `last_name` | CharField | max_length=50 | — |
 | `contact_number` | CharField | max_length=20, blank=True | — |
-| `address` | TextField | blank=True | Owner address (pet lives here too) |
+| `address_line`       | CharField | max_length=255, blank=True | House no., street, subdivision |
+| `barangay`           | CharField | max_length=100, blank=True | Barangay |
+| `city_municipality`  | CharField | max_length=100, blank=True | City or municipality |
+| `province`           | CharField | max_length=100, blank=True | Province |
 | `profile_photo` | ImageField | upload_to='owners/', blank=True, null=True | Optional |
 | `date_registered` | DateField | auto_now_add=True | — |
 | `is_archived` | BooleanField | default=False | Soft delete |
@@ -105,6 +108,7 @@ One-to-one relationship with User.
 - Restoring sets both back to False/True respectively
 - Address belongs to owner — pets inherit it implicitly
 - Profile photo is optional — initials avatar generated in UI if not uploaded
+- Full address is generated dynamically via a `full_address` model property
 
 ---
 

@@ -51,14 +51,14 @@ Phase 7 — Dashboards & Polish
 ### 1.2 Authentication — Pet Owner
 | Feature | Status |
 |---|---|
-| Register with email + password | `planned` |
-| Email verification on registration (confirmation link sent) | `planned` |
-| Account inactive until email verified | `planned` |
-| Sign in with Google (skips email verification) | `planned` |
-| Login page with both options (email/password + Google) | `planned` |
-| Logout | `planned` |
-| Forgot password / reset password via email | `planned` |
-| Redirect to onboarding flow after first login | `planned` |
+| Register with email + password | `complete` |
+| Email verification on registration (confirmation link sent) | `complete` |
+| Account inactive until email verified | `complete` |
+| Sign in with Google (skips email verification) | `complete` |
+| Login page with both options (email/password + Google) | `complete` |
+| Logout | `complete` |
+| Forgot password / reset password via email | `complete` |
+| Redirect to onboarding flow after first login | `complete` |
 
 ### 1.3 Authentication — Admin
 | Feature | Status |

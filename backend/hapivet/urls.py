@@ -1,9 +1,17 @@
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
+# imports for image
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
+
     # accounts (login, register, verification, dashboards)
     path("", include("accounts.urls")),
+
+    # pets (onboarding, pet management)
+    path("", include("pets.urls")),
 
     # allauth (Google OAuth, email verification, etc.)
     path("accounts/", include("allauth.urls")),
@@ -42,3 +50,7 @@ urlpatterns = [
         name="password_reset_complete",
     ),
 ]
+
+# Serve media files in development only
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

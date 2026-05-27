@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile — Hapi Vet{% endblock %}
+
+{% block content %}
+
+<div class="profile-edit-page">
+
+  <!-- Page header -->
+  <div class="profile-edit-header">
+    <h1 class="profile-edit-title">Edit Profile</h1>
+    <a href="{% url 'owner_profile' %}" class="btn-secondary">
+      Cancel
+    </a>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="profile-edit-form">
+    {% csrf_token %}
+
+    <!-- Profile photo -->
+    <div class="profile-edit-section">
+      <h3 class="profile-edit-section-title">Profile Photo</h3>
+
+      <!-- Show current photo if one exists -->
+      {% if pet_owner.profile_photo %}
+        <div class="current-photo-wrapper">
+          <img
+            src="{{ pet_owner.profile_photo.url }}"
+            alt="Current profile photo"
+            class="current-photo-preview"
+          />
+          <p class="current-photo-label">Current photo</p>
+        </div>
+      {% endif %}
+
+      <div class="form-section">
+        {{ profile_form.profile_photo }}
+        {% if profile_form.profile_photo.errors %}
+          <p class="form-error">{{ profile_form.profile_photo.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Personal info -->
+    <div class="profile-edit-section">
+      <h3 class="profile-edit-section-title">Personal Information</h3>
+
+      <div class="form-row-two-col">
+
+        <div class="form-section">
+          <label class="form-label" for="{{ profile_form.first_name.id_for_label }}">
+            First Name <span class="required-tag">*</span>
+          </label>
+          {{ profile_form.first_name }}
+          {% if profile_form.first_name.errors %}
+            <p class="form-error">{{ profile_form.first_name.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="{{ profile_form.last_name.id_for_label }}">
+            Last Name <span class="required-tag">*</span>
+          </label>
+          {{ profile_form.last_name }}
+          {% if profile_form.last_name.errors %}
+            <p class="form-error">{{ profile_form.last_name.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <div class="form-section">
+        <label class="form-label" for="{{ profile_form.contact_number.id_for_label }}">
+          Contact Number <span class="optional-tag">(optional)</span>
+        </label>
+        {{ profile_form.contact_number }}
+        {% if profile_form.contact_number.errors %}
+          <p class="form-error">{{ profile_form.contact_number.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Address -->
+    <div class="profile-edit-section">
+      <h3 class="profile-edit-section-title">Address</h3>
+
+      <div class="form-section">
+        <label class="form-label" for="{{ profile_form.address_line.id_for_label }}">
+          Address Line <span class="optional-tag">(optional)</span>
+        </label>
+        {{ profile_form.address_line }}
+        {% if profile_form.address_line.errors %}
+          <p class="form-error">{{ profile_form.address_line.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="form-row-two-col">
+
+        <div class="form-section">
+          <label class="form-label" for="{{ profile_form.barangay.id_for_label }}">
+            Barangay <span class="optional-tag">(optional)</span>
+          </label>
+          {{ profile_form.barangay }}
+          {% if profile_form.barangay.errors %}
+            <p class="form-error">{{ profile_form.barangay.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="{{ profile_form.city_municipality.id_for_label }}">
+            City / Municipality <span class="optional-tag">(optional)</span>
+          </label>
+          {{ profile_form.city_municipality }}
+          {% if profile_form.city_municipality.errors %}
+            <p class="form-error">{{ profile_form.city_municipality.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <div class="form-section">
+        <label class="form-label" for="{{ profile_form.province.id_for_label }}">
+          Province <span class="optional-tag">(optional)</span>
+        </label>
+        {{ profile_form.province }}
+        {% if profile_form.province.errors %}
+          <p class="form-error">{{ profile_form.province.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Contact links -->
+    <div class="profile-edit-section">
+      <h3 class="profile-edit-section-title">Social / Contact Links</h3>
+      <p class="form-hint">Leave rows blank to remove existing links.</p>
+
+      {{ link_formset.management_form }}
+
+      <div class="contact-links-list">
+        {% for link_form in link_formset %}
+          <div class="contact-link-row">
+
+            <div class="contact-link-platform">
+              {{ link_form.platform }}
+              {% if link_form.platform.errors %}
+                <p class="form-error">{{ link_form.platform.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div class="contact-link-handle">
+              {{ link_form.url_or_handle }}
+              {% if link_form.url_or_handle.errors %}
+                <p class="form-error">{{ link_form.url_or_handle.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            {% if link_form.non_field_errors %}
+              <p class="form-error">{{ link_form.non_field_errors.0 }}</p>
+            {% endif %}
+
+          </div>
+        {% endfor %}
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <a href="{% url 'owner_profile' %}" class="btn-secondary">Cancel</a>
+      <button type="submit" class="btn-primary">Save Changes</button>
+    </div>
+
+  </form>
+
+</div>
+
+{% endblock %}

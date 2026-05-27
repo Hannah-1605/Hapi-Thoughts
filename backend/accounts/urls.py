@@ -12,6 +12,8 @@ urlpatterns = [
     path("admin-login/", views.admin_login, name="admin_login"),
     # Dashboards (placeholders)
     path("owner/dashboard/", views.owner_dashboard, name="owner_dashboard"),
+    
     path("owner/onboarding/", views.owner_onboarding, name="owner_onboarding"),
+    
     path("admin/dashboard/", views.admin_dashboard, name="admin_dashboard"),
 ]

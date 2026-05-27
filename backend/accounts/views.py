@@ -152,7 +152,7 @@ def owner_verify_email(request, uidb64, token):
         user.save()
         messages.success(
             request,
-            "Your email has been verified. You can now log in.",
+            "Email verified successfully. You can now log in.",
         )
         return redirect("owner_login")
 
@@ -224,7 +224,11 @@ def owner_dashboard(request):
 
 @login_required
 def owner_onboarding(request):
-    """Placeholder onboarding view — built properly in Phase 2."""
+    """
+    Keeps the owner_onboarding URL name intact for login redirect logic.
+    Forwards immediately to the real onboarding Step 1 in the pets app.
+    """
     if request.user.role != "pet_owner":
         return redirect("admin_dashboard")
-    return render(request, "owner/onboarding.html")
+    return redirect("owner_onboarding_step1")
+

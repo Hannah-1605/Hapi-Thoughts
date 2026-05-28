@@ -1,10 +1,44 @@
 {% extends 'base.html' %}
+
 {% block title %}Admin Dashboard — Hapi Vet{% endblock %}
+
 {% block content %}
-<!-- Admin dashboard placeholder -->
-<div class="dashboard-page">
-  <h1>Admin Dashboard</h1>
-  <p>Logged in as: {{ request.user.email }}</p>
-  <a href="{% url 'logout' %}">Logout</a>
+
+<div class="admin-page">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Admin Dashboard</h1>
+  </div>
+
+  <!-- Quick navigation — temporary until Phase 7 sidebar is built -->
+  <div class="admin-nav-grid">
+
+    <div class="admin-nav-card">
+      <h3 class="admin-nav-card-title">Pet Owners</h3>
+      <p class="admin-nav-card-desc">View, create, and manage pet owner accounts.</p>
+      <a href="{% url 'admin_owner_list' %}" class="btn-primary">
+        Go to Pet Owners
+      </a>
+    </div>
+
+    <div class="admin-nav-card">
+      <h3 class="admin-nav-card-title">Pets</h3>
+      <p class="admin-nav-card-desc">View and manage all registered pets.</p>
+      <a href="{% url 'admin_pet_list' %}" class="btn-primary">
+        Go to Pets
+      </a>
+    </div>
+
+    <div class="admin-nav-card">
+      <h3 class="admin-nav-card-title">Deletion Requests</h3>
+      <p class="admin-nav-card-desc">Review and action pending pet deletion requests.</p>
+      <a href="{% url 'admin_deletion_requests' %}" class="btn-primary">
+        Go to Deletion Requests
+      </a>
+    </div>
+
+  </div>
+
 </div>
+
 {% endblock %}

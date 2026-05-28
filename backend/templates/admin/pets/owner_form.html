@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ form_title }} — Hapi Vet Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-page">
+
+  <div class="admin-form-header">
+    <h1 class="admin-form-title">{{ form_title }}</h1>
+    {% if owner %}
+      <a href="{% url 'admin_owner_detail' owner.pk %}" class="btn-secondary">
+        Cancel
+      </a>
+    {% else %}
+      <a href="{% url 'admin_owner_list' %}" class="btn-secondary">
+        Cancel
+      </a>
+    {% endif %}
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="admin-form">
+    {% csrf_token %}
+
+    <!-- Profile photo -->
+    <div class="admin-form-section">
+      <h3 class="admin-form-section-title">Profile Photo</h3>
+
+      {% if owner and owner.profile_photo %}
+        <div class="current-photo-wrapper">
+          <img
+            src="{{ owner.profile_photo.url }}"
+            alt="Current photo"
+            class="current-photo-preview"
+          />
+          <p class="current-photo-label">Current photo</p>
+        </div>
+      {% endif %}
+
+      <div class="form-section">
+        {{ form.profile_photo }}
+        {% if form.profile_photo.errors %}
+          <p class="form-error">{{ form.profile_photo.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Personal info -->
+    <div class="admin-form-section">
+      <h3 class="admin-form-section-title">Personal Information</h3>
+
+      <div class="form-row-two-col">
+
+        <div class="form-section">
+          <label class="form-label" for="{{ form.first_name.id_for_label }}">
+            First Name <span class="required-tag">*</span>
+          </label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}
+            <p class="form-error">{{ form.first_name.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="{{ form.last_name.id_for_label }}">
+            Last Name <span class="required-tag">*</span>
+          </label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}
+            <p class="form-error">{{ form.last_name.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <div class="form-section">
+        <label class="form-label" for="{{ form.contact_number.id_for_label }}">
+          Contact Number <span class="optional-tag">(optional)</span>
+        </label>
+        {{ form.contact_number }}
+        {% if form.contact_number.errors %}
+          <p class="form-error">{{ form.contact_number.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Address -->
+    <div class="admin-form-section">
+      <h3 class="admin-form-section-title">Address</h3>
+
+      <div class="form-section">
+        <label class="form-label" for="{{ form.address_line.id_for_label }}">
+          Address Line <span class="optional-tag">(optional)</span>
+        </label>
+        {{ form.address_line }}
+        {% if form.address_line.errors %}
+          <p class="form-error">{{ form.address_line.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div class="form-row-two-col">
+
+        <div class="form-section">
+          <label class="form-label" for="{{ form.barangay.id_for_label }}">
+            Barangay <span class="optional-tag">(optional)</span>
+          </label>
+          {{ form.barangay }}
+          {% if form.barangay.errors %}
+            <p class="form-error">{{ form.barangay.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+        <div class="form-section">
+          <label class="form-label" for="{{ form.city_municipality.id_for_label }}">
+            City / Municipality <span class="optional-tag">(optional)</span>
+          </label>
+          {{ form.city_municipality }}
+          {% if form.city_municipality.errors %}
+            <p class="form-error">{{ form.city_municipality.errors.0 }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <div class="form-section">
+        <label class="form-label" for="{{ form.province.id_for_label }}">
+          Province <span class="optional-tag">(optional)</span>
+        </label>
+        {{ form.province }}
+        {% if form.province.errors %}
+          <p class="form-error">{{ form.province.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      {% if owner %}
+        <a href="{% url 'admin_owner_detail' owner.pk %}" class="btn-secondary">
+          Cancel
+        </a>
+      {% else %}
+        <a href="{% url 'admin_owner_list' %}" class="btn-secondary">
+          Cancel
+        </a>
+      {% endif %}
+      <button type="submit" class="btn-primary">{{ submit_label }}</button>
+    </div>
+
+  </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Pet Owners — Hapi Vet Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-page">
+
+  <!-- Page header -->
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">Pet Owners</h1>
+    <a href="{% url 'admin_owner_create' %}" class="btn-primary">
+      + Add Pet Owner
+    </a>
+  </div>
+
+  <!-- Search and filter bar -->
+  <form method="get" class="admin-filter-bar">
+
+    <input
+      type="text"
+      name="search"
+      value="{{ search_query }}"
+      placeholder="Search by name or email..."
+      class="admin-search-input"
+    />
+
+    <select name="status" class="admin-filter-select">
+      <option value="active" {% if status_filter == "active" %}selected{% endif %}>
+        Active
+      </option>
+      <option value="archived" {% if status_filter == "archived" %}selected{% endif %}>
+        Archived
+      </option>
+    </select>
+
+    <button type="submit" class="btn-secondary">Search</button>
+
+    {% if search_query or status_filter != "active" %}
+      <a href="{% url 'admin_owner_list' %}" class="btn-secondary">
+        Clear
+      </a>
+    {% endif %}
+
+  </form>
+
+  <!-- Results count -->
+  <p class="admin-results-count">
+    {{ total_count }} owner{{ total_count|pluralize }} found
+  </p>
+
+  {% if owners %}
+
+    <!-- Owners table -->
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Contact</th>
+            <th>Pets</th>
+            <th>Registered</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for owner in owners %}
+            <tr class="admin-table-row">
+
+              <!-- Name + avatar -->
+              <td class="admin-table-cell">
+                <div class="admin-owner-name-cell">
+                  {% if owner.profile_photo %}
+                    <img
+                      src="{{ owner.profile_photo.url }}"
+                      alt="{{ owner.full_name }}"
+                      class="admin-avatar-small"
+                    />
+                  {% else %}
+                    <div class="admin-avatar-initials-small">
+                      {{ owner.first_name|first|upper }}{{ owner.last_name|first|upper }}
+                    </div>
+                  {% endif %}
+                  <span>{{ owner.full_name }}</span>
+                </div>
+              </td>
+
+              <td class="admin-table-cell">{{ owner.user.email }}</td>
+
+              <td class="admin-table-cell">
+                {{ owner.contact_number|default:"—" }}
+              </td>
+
+              <td class="admin-table-cell">
+                {{ owner.pets.count }}
+              </td>
+
+              <td class="admin-table-cell">
+                {{ owner.date_registered|date:"M d, Y" }}
+              </td>
+
+              <td class="admin-table-cell">
+                {% if owner.is_archived %}
+                  <span class="status-badge status-archived">Archived</span>
+                {% else %}
+                  <span class="status-badge status-active">Active</span>
+                {% endif %}
+              </td>
+
+              <td class="admin-table-cell">
+                <a href="{% url 'admin_owner_detail' owner.pk %}" class="admin-table-link">
+                  View
+                </a>
+              </td>
+
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% else %}
+
+    <!-- Empty state -->
+    <div class="admin-empty">
+      {% if search_query %}
+        <p class="admin-empty-message">
+          No owners found for "{{ search_query }}".
+        </p>
+      {% else %}
+        <p class="admin-empty-message">No pet owners registered yet.</p>
+      {% endif %}
+    </div>
+
+  {% endif %}
+
+</div>
+
+{% endblock %}

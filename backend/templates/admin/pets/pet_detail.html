@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ pet.name }} — Hapi Vet Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-page">
+
+  <a href="{% url 'admin_pet_list' %}" class="back-link">← Back to Pets</a>
+
+  <!-- Archived warning -->
+  {% if pet.is_archived %}
+    <div class="archived-banner">
+      <p class="archived-banner-text">This pet has been archived.</p>
+    </div>
+  {% endif %}
+
+  <!-- Pending deletion banner -->
+  {% if pending_deletion %}
+    <div class="deletion-warning">
+      <p class="deletion-warning-text">
+        A deletion request for {{ pet.name }} is pending review.
+        Reason: {{ pending_deletion.get_reason_display }}.
+      </p>
+      <div class="deletion-warning-actions">
+        <form method="post" action="{% url 'admin_approve_deletion' pending_deletion.pk %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn-danger">Approve Deletion</button>
+        </form>
+        <form method="post" action="{% url 'admin_reject_deletion' pending_deletion.pk %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn-secondary">Reject</button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="admin-detail-header">
+
+    <!-- Pet avatar -->
+    <div class="admin-avatar-large-wrapper">
+      {% if pet.photo %}
+        <img src="{{ pet.photo.url }}" alt="{{ pet.name }}" class="admin-avatar-large" />
+      {% else %}
+        <div class="admin-avatar-initials-large">{{ pet.name|first|upper }}</div>
+      {% endif %}
+    </div>
+
+    <div class="admin-detail-header-info">
+      <h1 class="admin-detail-name">{{ pet.name }}</h1>
+      <p class="admin-detail-email">
+        {{ pet.species }}{% if pet.breed %} · {{ pet.breed }}{% endif %}
+      </p>
+      <p class="admin-detail-since">
+        Owner: <a href="{% url 'admin_owner_detail' pet.owner.pk %}" class="admin-table-link">{{ pet.owner.full_name }}</a>
+      </p>
+    </div>
+
+    {% if not pet.is_archived %}
+      <div class="admin-detail-actions">
+        <a href="{% url 'admin_pet_edit' pet.pk %}" class="btn-primary">Edit Pet</a>
+      </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Pet details -->
+  <div class="admin-detail-section">
+    <h3 class="admin-detail-section-title">Pet Information</h3>
+
+    <div class="admin-detail-field">
+      <span class="admin-detail-label">Gender</span>
+      <span class="admin-detail-value">{{ pet.get_gender_display }}</span>
+    </div>
+
+    <div class="admin-detail-field">
+      <span class="admin-detail-label">Date of Birth</span>
+      <span class="admin-detail-value">
+        {% if pet.date_of_birth %}
+          {{ pet.date_of_birth|date:"F d, Y" }} ({{ pet.age }})
+        {% else %}
+          Unknown
+        {% endif %}
+      </span>
+    </div>
+
+    <div class="admin-detail-field">
+      <span class="admin-detail-label">Color</span>
+      <span class="admin-detail-value">{{ pet.color|default:"Not specified" }}</span>
+    </div>
+
+    <div class="admin-detail-field">
+      <span class="admin-detail-label">Weight</span>
+      <span class="admin-detail-value">
+        {% if pet.weight %}{{ pet.weight }} kg{% else %}Not specified{% endif %}
+      </span>
+    </div>
+
+    <div class="admin-detail-field">
+      <span class="admin-detail-label">Registration No.</span>
+      <span class="admin-detail-value">{{ pet.registration_number|default:"Not provided" }}</span>
+    </div>
+
+  </div>
+
+  <!-- Medical history stub — Phase 4 -->
+  <div class="admin-detail-section">
+    <h3 class="admin-detail-section-title">Medical History</h3>
+    <p class="admin-detail-empty">Medical records will appear here.</p>
+  </div>
+
+  <!-- Vaccination history stub — Phase 4 -->
+  <div class="admin-detail-section">
+    <h3 class="admin-detail-section-title">Vaccination History</h3>
+    <p class="admin-detail-empty">Vaccination records will appear here.</p>
+  </div>
+
+</div>
+
+{% endblock %}

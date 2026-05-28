@@ -34,3 +34,4 @@ class Command(BaseCommand):
             f"  Role:     {user.get_role_display()}\n"
             f"\nChange this password after first login."
         ))
+        

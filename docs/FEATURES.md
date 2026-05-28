@@ -101,7 +101,7 @@ Phase 7 — Dashboards & Polish
 |---|---|
 | View own profile | `complete` |
 | Edit profile (name, address, contact number, email) | `complete` |
-| Edit contact links (Facebook, other socials) | `planned` |
+| Edit contact links (Facebook, other socials) | `complete` |
 | Profile photo upload (optional) | `complete` |
 | Auto-generated initials avatar if no photo uploaded | `complete` |
 | Notification preferences settings | `planned` |
@@ -112,14 +112,14 @@ Phase 7 — Dashboards & Polish
 ### 2.3 Pet Management (Pet Owner)
 | Feature | Status |
 |---|---|
-| Add a new pet | `planned` |
-| Edit minor pet details directly (name, color, weight, breed) | `planned` |
-| Pet photo upload (optional) | `planned` |
-| Auto-generated initials avatar if no pet photo uploaded | `planned` |
-| Request pet deletion with predefined reason | `planned` |
-| Predefined deletion reasons (passed away, rehomed, duplicate, other) | `planned` |
+| Add a new pet | `complete` |
+| Edit minor pet details directly (name, color, weight, breed) | `complete` |
+| Pet photo upload (optional) | `complete` |
+| Auto-generated initials avatar if no pet photo uploaded | `complete` |
+| Request pet deletion with predefined reason | `complete` |
+| Predefined deletion reasons (passed away, rehomed, duplicate, other) | `complete` |
 | Deletion request goes to Admin for approval | `planned` |
-| View pet profile | `planned` |
+| View pet profile | `complete` |
 | View pet vaccination history | `planned` |
 | View pet medical history (read-only, public notes only) | `planned` |
 

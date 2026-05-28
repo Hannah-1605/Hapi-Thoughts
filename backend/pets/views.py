@@ -7,10 +7,29 @@ from django.shortcuts import redirect, render
 from .forms import ContactLinkFormSet, PetForm, PetOwnerProfileForm
 from .models import PetOwner
 
-from .forms import ContactLinkFormSet, PetDeletionRequestForm, PetForm, PetOwnerProfileForm
+from .forms import (
+    ContactLinkFormSet,
+    PetDeletionRequestForm,
+    PetForm,
+    PetOwnerProfileForm,
+)
 from .models import Pet, PetDeletionRequest, PetOwner
 
 from django.shortcuts import get_object_or_404, redirect, render
+
+from django.utils import timezone
+
+from django.db.models import Q
+
+
+from .forms import (
+    AdminPetForm,
+    AdminPetOwnerForm,
+    ContactLinkFormSet,
+    PetDeletionRequestForm,
+    PetForm,
+    PetOwnerProfileForm,
+)
 
 
 def _require_pet_owner(request):
@@ -489,3 +508,440 @@ def owner_pet_cancel_delete_request(request, pk):
         )
 
     return redirect("owner_pet_detail", pk=pet.pk)
+
+
+def _require_admin(request):
+    """
+    Shared guard for all admin views.
+    Returns a redirect response if the user is not admin, or None if ok.
+    """
+    if request.user.role != "admin":
+        return redirect("owner_dashboard")
+    return None
+
+
+# ---------------------------------------------------------------------------
+# Admin — Pet Owner List
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_owner_list(request):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    # Search and filter
+    search_query = request.GET.get("search", "").strip()
+    status_filter = request.GET.get("status", "active")
+
+    owners = PetOwner.objects.select_related("user").all()
+
+    # Apply status filter
+    if status_filter == "archived":
+        owners = owners.filter(is_archived=True)
+    else:
+        # Default to active
+        owners = owners.filter(is_archived=False)
+
+    # Apply search — matches first name, last name, or email
+    if search_query:
+        owners = owners.filter(
+            Q(first_name__icontains=search_query)
+            | Q(last_name__icontains=search_query)
+            | Q(user__email__icontains=search_query)
+        )
+
+    return render(
+        request,
+        "admin/pets/owners_list.html",
+        {
+            "owners": owners,
+            "search_query": search_query,
+            "status_filter": status_filter,
+            "total_count": owners.count(),
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Admin — Pet Owner Detail
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_owner_detail(request, pk):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    owner = get_object_or_404(PetOwner, pk=pk)
+    pets = Pet.objects.filter(owner=owner, is_archived=False)
+    archived_pets = Pet.objects.filter(owner=owner, is_archived=True)
+    contact_links = owner.contact_links.all()
+
+    # Pending deletion requests for this owner's pets
+    pending_deletions = PetDeletionRequest.objects.filter(
+        pet__owner=owner,
+        status=PetDeletionRequest.PENDING,
+    ).select_related("pet")
+
+    return render(
+        request,
+        "admin/pets/owner_detail.html",
+        {
+            "owner": owner,
+            "pets": pets,
+            "archived_pets": archived_pets,
+            "contact_links": contact_links,
+            "pending_deletions": pending_deletions,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Admin — Create Pet Owner
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_owner_create(request):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    if request.method == "POST":
+        form = AdminPetOwnerForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Note: this creates a PetOwner record only.
+            # Full walk-in flow (User account + appointment) is in Phase 2.5.
+            # For now Admin can create the profile details only.
+            owner = form.save(commit=False)
+            owner.save()
+            messages.success(
+                request,
+                f"{owner.full_name} has been added.",
+            )
+            return redirect("admin_owner_detail", pk=owner.pk)
+    else:
+        form = AdminPetOwnerForm()
+
+    return render(
+        request,
+        "admin/pets/owner_form.html",
+        {
+            "form": form,
+            "form_title": "Add Pet Owner",
+            "submit_label": "Create Owner",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Admin — Edit Pet Owner
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_owner_edit(request, pk):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    owner = get_object_or_404(PetOwner, pk=pk)
+
+    if request.method == "POST":
+        form = AdminPetOwnerForm(request.POST, request.FILES, instance=owner)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                f"{owner.full_name}'s details have been updated.",
+            )
+            return redirect("admin_owner_detail", pk=owner.pk)
+    else:
+        form = AdminPetOwnerForm(instance=owner)
+
+    return render(
+        request,
+        "admin/pets/owner_form.html",
+        {
+            "form": form,
+            "owner": owner,
+            "form_title": f"Edit {owner.full_name}",
+            "submit_label": "Save Changes",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Admin — Archive Pet Owner
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_owner_archive(request, pk):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    owner = get_object_or_404(PetOwner, pk=pk, is_archived=False)
+
+    if request.method == "POST":
+        owner.archive()
+        messages.success(
+            request,
+            f"{owner.full_name}'s account has been archived.",
+        )
+        return redirect("admin_owner_list")
+
+    return redirect("admin_owner_detail", pk=owner.pk)
+
+
+# ---------------------------------------------------------------------------
+# Admin — Restore Pet Owner
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_owner_restore(request, pk):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    owner = get_object_or_404(PetOwner, pk=pk, is_archived=True)
+
+    if request.method == "POST":
+        owner.restore()
+        messages.success(
+            request,
+            f"{owner.full_name}'s account has been restored.",
+        )
+        return redirect("admin_owner_detail", pk=owner.pk)
+
+    return redirect("admin_owner_detail", pk=owner.pk)
+
+
+# ---------------------------------------------------------------------------
+# Admin — Pet List
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_pet_list(request):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    search_query = request.GET.get("search", "").strip()
+    species_filter = request.GET.get("species", "").strip()
+
+    pets = Pet.objects.select_related("owner").filter(is_archived=False)
+
+    if search_query:
+        pets = pets.filter(
+            Q(name__icontains=search_query)
+            | Q(owner__first_name__icontains=search_query)
+            | Q(owner__last_name__icontains=search_query)
+        )
+
+    if species_filter:
+        pets = pets.filter(species__icontains=species_filter)
+
+    # Get distinct species for the filter dropdown
+    species_list = (
+        Pet.objects.filter(is_archived=False)
+        .values_list("species", flat=True)
+        .distinct()
+        .order_by("species")
+    )
+
+    return render(
+        request,
+        "admin/pets/pets_list.html",
+        {
+            "pets": pets,
+            "search_query": search_query,
+            "species_filter": species_filter,
+            "species_list": species_list,
+            "total_count": pets.count(),
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Admin — Pet Detail
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_pet_detail(request, pk):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    # Admin can view archived pets too
+    pet = get_object_or_404(Pet, pk=pk)
+
+    pending_deletion = PetDeletionRequest.objects.filter(
+        pet=pet,
+        status=PetDeletionRequest.PENDING,
+    ).first()
+
+    return render(
+        request,
+        "admin/pets/pet_detail.html",
+        {
+            "pet": pet,
+            "pending_deletion": pending_deletion,
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Admin — Edit Pet
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_pet_edit(request, pk):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    pet = get_object_or_404(Pet, pk=pk)
+
+    if request.method == "POST":
+        form = AdminPetForm(request.POST, request.FILES, instance=pet)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                f"{pet.name} has been updated.",
+            )
+            return redirect("admin_pet_detail", pk=pet.pk)
+    else:
+        form = AdminPetForm(instance=pet)
+
+    return render(
+        request,
+        "admin/pets/pet_form.html",
+        {
+            "form": form,
+            "pet": pet,
+            "form_title": f"Edit {pet.name}",
+            "submit_label": "Save Changes",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Admin — Deletion Requests List
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_deletion_requests(request):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    # Show pending requests first, then resolved ones
+    pending = (
+        PetDeletionRequest.objects.filter(
+            status=PetDeletionRequest.PENDING,
+        )
+        .select_related("pet", "pet__owner", "requested_by")
+        .order_by("-created_at")
+    )
+
+    resolved = (
+        PetDeletionRequest.objects.exclude(
+            status=PetDeletionRequest.PENDING,
+        )
+        .select_related("pet", "pet__owner", "requested_by", "reviewed_by")
+        .order_by("-reviewed_at")
+    )
+
+    return render(
+        request,
+        "admin/pets/deletion_requests.html",
+        {
+            "pending": pending,
+            "resolved": resolved,
+            "pending_count": pending.count(),
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Admin — Approve Deletion Request
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_approve_deletion(request, pk):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    deletion_request = get_object_or_404(
+        PetDeletionRequest,
+        pk=pk,
+        status=PetDeletionRequest.PENDING,
+    )
+
+    if request.method == "POST":
+        # Soft delete the pet
+        pet = deletion_request.pet
+        pet.is_archived = True
+        pet.archived_at = timezone.now()
+        pet.save()
+
+        # Mark request as approved
+        deletion_request.status = PetDeletionRequest.APPROVED
+        deletion_request.reviewed_by = request.user
+        deletion_request.reviewed_at = timezone.now()
+        deletion_request.save()
+
+        messages.success(
+            request,
+            f"Deletion request for {pet.name} has been approved. "
+            "The pet has been archived.",
+        )
+        return redirect("admin_deletion_requests")
+
+    return redirect("admin_deletion_requests")
+
+
+# ---------------------------------------------------------------------------
+# Admin — Reject Deletion Request
+# ---------------------------------------------------------------------------
+
+
+@login_required
+def admin_reject_deletion(request, pk):
+    guard = _require_admin(request)
+    if guard:
+        return guard
+
+    deletion_request = get_object_or_404(
+        PetDeletionRequest,
+        pk=pk,
+        status=PetDeletionRequest.PENDING,
+    )
+
+    if request.method == "POST":
+        deletion_request.status = PetDeletionRequest.REJECTED
+        deletion_request.reviewed_by = request.user
+        deletion_request.reviewed_at = timezone.now()
+        deletion_request.save()
+
+        messages.success(
+            request,
+            f"Deletion request for {deletion_request.pet.name} "
+            "has been rejected. The pet remains active.",
+        )
+        return redirect("admin_deletion_requests")
+
+    return redirect("admin_deletion_requests")

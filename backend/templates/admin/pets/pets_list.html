@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Pets — Hapi Vet Admin{% endblock %}
+
+{% block content %}
+
+<div class="admin-page">
+
+  <div class="admin-page-header">
+    <h1 class="admin-page-title">All Pets</h1>
+  </div>
+
+  <!-- Search and filter bar -->
+  <form method="get" class="admin-filter-bar">
+
+    <input
+      type="text"
+      name="search"
+      value="{{ search_query }}"
+      placeholder="Search by pet name or owner name..."
+      class="admin-search-input"
+    />
+
+    <!-- Species filter — populated from DB -->
+    <select name="species" class="admin-filter-select">
+      <option value="">All Species</option>
+      {% for species in species_list %}
+        <option
+          value="{{ species }}"
+          {% if species_filter == species %}selected{% endif %}
+        >
+          {{ species }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" class="btn-secondary">Search</button>
+
+    {% if search_query or species_filter %}
+      <a href="{% url 'admin_pet_list' %}" class="btn-secondary">Clear</a>
+    {% endif %}
+
+  </form>
+
+  <p class="admin-results-count">
+    {{ total_count }} pet{{ total_count|pluralize }} found
+  </p>
+
+  {% if pets %}
+
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Pet</th>
+            <th>Species / Breed</th>
+            <th>Owner</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pet in pets %}
+            <tr class="admin-table-row">
+
+              <!-- Pet name + avatar -->
+              <td class="admin-table-cell">
+                <div class="admin-owner-name-cell">
+                  {% if pet.photo %}
+                    <img
+                      src="{{ pet.photo.url }}"
+                      alt="{{ pet.name }}"
+                      class="admin-avatar-small"
+                    />
+                  {% else %}
+                    <div class="admin-avatar-initials-small">
+                      {{ pet.name|first|upper }}
+                    </div>
+                  {% endif %}
+                  <span>{{ pet.name }}</span>
+                </div>
+              </td>
+
+              <td class="admin-table-cell">
+                {{ pet.species }}{% if pet.breed %} · {{ pet.breed }}{% endif %}
+              </td>
+
+              <td class="admin-table-cell">
+                <a href="{% url 'admin_owner_detail' pet.owner.pk %}" class="admin-table-link">{{ pet.owner.full_name }}</a>
+              </td>
+
+              <td class="admin-table-cell">{{ pet.age }}</td>
+
+              <td class="admin-table-cell">{{ pet.get_gender_display }}</td>
+
+              <td class="admin-table-cell">
+                <a href="{% url 'admin_pet_detail' pet.pk %}" class="admin-table-link">View</a>
+              </td>
+
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% else %}
+
+    <div class="admin-empty">
+      {% if search_query or species_filter %}
+        <p class="admin-empty-message">No pets found matching your search.</p>
+      {% else %}
+        <p class="admin-empty-message">No pets registered yet.</p>
+      {% endif %}
+    </div>
+
+  {% endif %}
+
+</div>
+
+{% endblock %}

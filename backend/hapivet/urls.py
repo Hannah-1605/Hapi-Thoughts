@@ -6,16 +6,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-
     # accounts (login, register, verification, dashboards)
     path("", include("accounts.urls")),
-
     # pets (onboarding, pet management)
     path("", include("pets.urls")),
-
     # allauth (Google OAuth, email verification, etc.)
     path("accounts/", include("allauth.urls")),
-
     # ─── Password Reset (Django built-in views) ───────────────────────────
     path(
         "forgot-password/",

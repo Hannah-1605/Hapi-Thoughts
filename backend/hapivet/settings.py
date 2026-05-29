@@ -88,7 +88,9 @@ DATABASES = {
 
 # ─── Password Validation ──────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -101,11 +103,11 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # allauth configuration
-ACCOUNT_LOGIN_METHODS = {"email"}          # login with email, not username
+ACCOUNT_LOGIN_METHODS = {"email"}  # login with email, not username
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"   # require email confirmation
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # require email confirmation
 ACCOUNT_UNIQUE_EMAIL = True
-LOGIN_REDIRECT_URL = "/"                   # we'll override this with role-based redirect
+LOGIN_REDIRECT_URL = "/"  # we'll override this with role-based redirect
 ACCOUNT_LOGOUT_REDIRECT_URL = "/login/"
 
 # ─── Email ────────────────────────────────────────────────────────────────────
@@ -134,7 +136,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # ─── Internationalization ─────────────────────────────────────────────────────
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "Asia/Manila"   # Philippines timezone
+TIME_ZONE = "Asia/Manila"  # Philippines timezone
 USE_I18N = True
 USE_TZ = True
 

@@ -8,10 +8,22 @@ from django.conf.urls.static import static
 urlpatterns = [
     # accounts (login, register, verification, dashboards)
     path("", include("accounts.urls")),
+    
     # pets (onboarding, pet management)
     path("", include("pets.urls")),
+
+    # appointments (booking, calendar, clinic settings)
+    path("", include("appointments.urls")),   
+    
+    # medical records (clinical documentation, prescriptions, test results)
+    path("", include("medical.urls")),  
+    
+    # billing (services, receipts, payment status)
+    path("", include("billing.urls")),
+
     # allauth (Google OAuth, email verification, etc.)
     path("accounts/", include("allauth.urls")),
+
     # ─── Password Reset (Django built-in views) ───────────────────────────
     path(
         "forgot-password/",

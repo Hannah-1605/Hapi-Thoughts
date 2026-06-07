@@ -75,6 +75,14 @@ def owner_login(request):
             return render(request, "owner/login.html", {"email": email})
 
         login(request, user)
+        
+        # Remember Me
+        if request.POST.get("remember_me"):
+            # Stay logged in for 30 days
+            request.session.set_expiry(60 * 60 * 24 * 30)
+        else:
+            # Session expires when browser closes
+            request.session.set_expiry(0)
 
         if not user.is_onboarded:
             return redirect("owner_onboarding")

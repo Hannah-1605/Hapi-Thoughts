@@ -31,6 +31,7 @@ from .models import (
     PetOwner,
 )
 
+from notifications.models import NotificationPreference
 
 def _require_pet_owner(request):
     """
@@ -201,6 +202,7 @@ def owner_profile(request):
         return redirect("owner_onboarding_step1")
 
     contact_links = pet_owner.contact_links.all()
+    preference = request.user.notification_preference
 
     return render(
         request,
@@ -208,6 +210,7 @@ def owner_profile(request):
         {
             "pet_owner": pet_owner,
             "contact_links": contact_links,
+            "preference": preference,
         },
     )
 
@@ -827,9 +830,6 @@ def _send_claim_email_for_owner(request, user):
         recipient_list=[user.email],
         fail_silently=False,
     )
-
-
-
 
 
 # ---------------------------------------------------------------------------

@@ -7,6 +7,9 @@ from django.utils import timezone
 
 from .models import Notification
 
+from .forms import NotificationPreferenceForm
+
+from django.contrib import messages
 
 @login_required
 def notification_panel(request):
@@ -159,3 +162,32 @@ def notification_open(request, pk):
     if request.user.is_admin:
         return redirect("admin_dashboard")
     return redirect("owner_dashboard")
+
+
+@login_required
+def owner_notification_preferences(request):
+    """
+    Pet Owner view — update email notification preferences.
+    The NotificationPreference row always exists (created via signal on registration).
+    """
+    if request.user.role != "pet_owner":
+        return redirect("admin_dashboard")
+
+    preference = request.user.notification_preference
+
+    if request.method == "POST":
+        form = NotificationPreferenceForm(request.POST, instance=preference)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Notification preferences updated.")
+            return redirect("owner_profile")
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = NotificationPreferenceForm(instance=preference)
+
+    return render(
+        request,
+        "owner/profile/notification_preferences.html",
+        {"form": form},
+    )

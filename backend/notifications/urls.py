@@ -36,5 +36,11 @@ urlpatterns = [
     name="notification_open",
     ),
 
+    path(
+        "owner/profile/notifications/",
+        views.owner_notification_preferences,
+        name="owner_notification_preferences",
+    ),
+
     
 ]

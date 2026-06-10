@@ -13,6 +13,7 @@ from .forms import (
     VaccinationEditForm,
 )
 
+from notifications.utils import notify
 
 # ── Admin — Medical Records ───────────────────────────────────────────────────
 
@@ -58,6 +59,21 @@ def admin_medical_record_create(request, pet_pk):
             record.appointment = appointment
             record.created_by = request.user
             record.save()
+
+            # Notify pet owner that a medical record has been created
+            notify(
+                recipient=pet.owner.user,
+                notification_type="appointment_approved",
+                title="Medical Record Created",
+                message=(
+                    f"A medical record has been created for {pet.name} "
+                    f"on {record.record_date.strftime('%B %d, %Y')}. "
+                    f"You can view the details in your pet's medical history."
+                ),
+                related_appointment=appointment,
+                related_pet=pet,
+                email_subject="Medical Record Created — Hapi Vet",
+            )
 
             messages.success(request, "Medical record created.")
             return redirect("admin_medical_record_detail", pk=record.pk)

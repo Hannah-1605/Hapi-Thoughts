@@ -6,6 +6,7 @@ from django.utils import timezone
 from .models import Service, BillingReceipt, BillingItem
 from .forms import ServiceForm, BillingReceiptForm, BillingItemForm
 
+from notifications.utils import notify
 
 # ── Admin — Services ──────────────────────────────────────────────────────────
 
@@ -186,6 +187,31 @@ def admin_receipt_create(request):
             receipt.pet = pet
             receipt.save()
 
+            # Notify pet owner that a billing receipt has been generated
+            if receipt.owner and receipt.owner.user:
+                if receipt.appointment:
+                    visit_date = receipt.appointment.date.strftime("%B %d, %Y")
+                    billing_message = (
+                        f"A billing receipt ({receipt.receipt_number}) has been "
+                        f"generated for your visit on {visit_date}. "
+                        f"Total amount: ₱{receipt.total_amount:,.2f}."
+                    )
+                else:
+                    billing_message = (
+                        f"A billing receipt ({receipt.receipt_number}) has been "
+                        f"generated for your account. "
+                        f"Total amount: ₱{receipt.total_amount:,.2f}."
+                    )
+                notify(
+                    recipient=receipt.owner.user,
+                    notification_type="billing_generated",
+                    title=f"Receipt {receipt.receipt_number} Generated",
+                    message=billing_message,
+                    related_billing=receipt,
+                    related_pet=receipt.pet,
+                    email_subject=f"Billing Receipt {receipt.receipt_number} — Hapi Vet",
+                )
+
             messages.success(
                 request,
                 f"Receipt {receipt.receipt_number} created.",
@@ -360,6 +386,23 @@ def admin_receipt_mark_paid(request, pk):
             receipt.payment_status = BillingReceipt.PAID
             receipt.payment_date = timezone.now().date()
             receipt.save()
+
+            # Notify pet owner that their receipt has been marked as paid
+            if receipt.owner and receipt.owner.user:
+                notify(
+                    recipient=receipt.owner.user,
+                    notification_type="billing_generated",
+                    title="Payment Confirmed",
+                    message=(
+                        f"Your payment for receipt {receipt.receipt_number} "
+                        f"(₱{receipt.total_amount:,.2f}) has been confirmed. "
+                        f"Thank you!"
+                    ),
+                    related_billing=receipt,
+                    related_pet=receipt.pet,
+                    email_subject=f"Payment Confirmed — {receipt.receipt_number}",
+                )
+                
             messages.success(
                 request,
                 f"Receipt {receipt.receipt_number} marked as paid.",

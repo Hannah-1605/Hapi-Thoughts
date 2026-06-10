@@ -1,7 +1,7 @@
 # notifications/views.py
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
 from django.utils import timezone
 
@@ -120,3 +120,42 @@ def notification_close(request):
     Called via HTMX when the close button is clicked on mobile.
     """
     return HttpResponse("")
+
+
+@login_required
+def notification_open(request, pk):
+    """
+    Marks a notification as read and redirects to the related object.
+    Called when a notification row is clicked.
+    """
+    notification = get_object_or_404(
+        Notification,
+        pk=pk,
+        recipient=request.user,
+    )
+
+    notification.mark_as_read()
+
+    # Redirect to the relevant page based on notification type and related objects
+    if notification.related_appointment:
+        if request.user.is_admin:
+            return redirect("admin_appointment_detail", pk=notification.related_appointment.pk)
+        else:
+            return redirect("owner_appointment_detail", pk=notification.related_appointment.pk)
+
+    if notification.related_billing:
+        if request.user.is_admin:
+            return redirect("admin_receipt_detail", pk=notification.related_billing.pk)
+        else:
+            return redirect("owner_receipt_detail", pk=notification.related_billing.pk)
+
+    if notification.related_pet:
+        if request.user.is_admin:
+            return redirect("admin_pet_detail", pk=notification.related_pet.pk)
+        else:
+            return redirect("owner_pet_detail", pk=notification.related_pet.pk)
+
+    # Fallback — no related object, go to notifications page
+    if request.user.is_admin:
+        return redirect("admin_dashboard")
+    return redirect("owner_dashboard")

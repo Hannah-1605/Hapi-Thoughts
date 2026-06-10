@@ -29,4 +29,12 @@ urlpatterns = [
         views.notification_close,
         name="notification_close",
     ),
+
+    path(
+    "notifications/<int:pk>/open/",
+    views.notification_open,
+    name="notification_open",
+    ),
+
+    
 ]

@@ -33,7 +33,11 @@
 
     <!-- Left: clinic name / logo placeholder -->
     <div class="dashboard-header-brand">
-      <span class="dashboard-brand-name">Hapi Vet</span>
+    {% if request.user.is_admin %}
+    <a href="{% url 'admin_dashboard' %}" class="dashboard-brand-name">Hapi Vet</a>
+    {% else %}
+    <a href="{% url 'owner_dashboard' %}" class="dashboard-brand-name">Hapi Vet</a>
+    {% endif %}
     </div>
 
     <!-- Right: bell icon + notification panel container -->

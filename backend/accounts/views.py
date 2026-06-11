@@ -75,7 +75,7 @@ def owner_login(request):
             return render(request, "owner/login.html", {"email": email})
 
         login(request, user)
-        
+
         # Remember Me
         if request.POST.get("remember_me"):
             # Stay logged in for 30 days

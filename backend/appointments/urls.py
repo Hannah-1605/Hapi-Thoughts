@@ -18,7 +18,6 @@ urlpatterns = [
         views.admin_blocked_date_delete,
         name="admin_blocked_date_delete",
     ),
-
     # ── Admin — Appointments ──────────────────────────────────────────────
     path(
         "admin/appointments/",
@@ -70,7 +69,6 @@ urlpatterns = [
         views.admin_appointment_reschedule,
         name="admin_appointment_reschedule",
     ),
-
     # ── Admin — HTMX helpers ──────────────────────────────────────────────
     path(
         "admin/appointments/pets/",
@@ -82,7 +80,6 @@ urlpatterns = [
         views.admin_get_slots_for_date,
         name="admin_get_slots_for_date",
     ),
-
     # ── Pet Owner — Appointments ──────────────────────────────────────────
     path(
         "owner/appointments/",
@@ -109,7 +106,6 @@ urlpatterns = [
         views.owner_appointment_reschedule,
         name="owner_appointment_reschedule",
     ),
-
     # ── HTMX — Slot loader (owner) ────────────────────────────────────────
     path(
         "owner/appointments/slots/",

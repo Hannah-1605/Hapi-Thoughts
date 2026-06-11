@@ -21,8 +21,8 @@ from .utils import get_available_slots
 from notifications.utils import notify
 from django.contrib.auth import get_user_model
 
-
 # ── Admin — Clinic Settings ───────────────────────────────────────────────────
+
 
 @login_required
 def admin_clinic_settings(request):
@@ -131,6 +131,7 @@ def admin_blocked_date_delete(request, pk):
 
 # ── Pet Owner — Appointments ──────────────────────────────────────────────────
 
+
 @login_required
 def owner_appointment_list(request):
     """
@@ -143,10 +144,14 @@ def owner_appointment_list(request):
     owner = request.user.petowner
     today = timezone.now().date()
 
-    upcoming = Appointment.objects.filter(
-        owner=owner,
-        date__gte=today,
-    ).exclude(status=Appointment.CANCELLED).order_by("date", "time")
+    upcoming = (
+        Appointment.objects.filter(
+            owner=owner,
+            date__gte=today,
+        )
+        .exclude(status=Appointment.CANCELLED)
+        .order_by("date", "time")
+    )
 
     past = Appointment.objects.filter(
         owner=owner,
@@ -307,7 +312,6 @@ def owner_appointment_cancel(request, pk):
                     email_subject="Appointment Cancelled — Hapi Vet",
                 )
 
-
             messages.success(request, "Your appointment has been cancelled.")
             return redirect("owner_appointments")
         else:
@@ -442,6 +446,7 @@ def owner_get_slots(request):
 
 # ── Admin — Appointments ──────────────────────────────────────────────────────
 
+
 @login_required
 def admin_appointment_list(request):
     """
@@ -465,18 +470,10 @@ def admin_appointment_list(request):
     counts = {
         "all": Appointment.objects.count(),
         "pending": Appointment.objects.filter(status=Appointment.PENDING).count(),
-        "confirmed": Appointment.objects.filter(
-            status=Appointment.CONFIRMED
-        ).count(),
-        "completed": Appointment.objects.filter(
-            status=Appointment.COMPLETED
-        ).count(),
-        "cancelled": Appointment.objects.filter(
-            status=Appointment.CANCELLED
-        ).count(),
-        "no_show": Appointment.objects.filter(
-            status=Appointment.NO_SHOW
-        ).count(),
+        "confirmed": Appointment.objects.filter(status=Appointment.CONFIRMED).count(),
+        "completed": Appointment.objects.filter(status=Appointment.COMPLETED).count(),
+        "cancelled": Appointment.objects.filter(status=Appointment.CANCELLED).count(),
+        "no_show": Appointment.objects.filter(status=Appointment.NO_SHOW).count(),
     }
 
     # Check if this is an HTMX request — return partial only
@@ -700,9 +697,7 @@ def admin_appointment_cancel(request, pk):
         form = AdminAppointmentCancelForm(request.POST)
         if form.is_valid():
             appointment.status = Appointment.CANCELLED
-            appointment.cancellation_reason = form.cleaned_data[
-                "cancellation_reason"
-            ]
+            appointment.cancellation_reason = form.cleaned_data["cancellation_reason"]
             appointment.cancellation_detail = form.cleaned_data.get(
                 "cancellation_detail", ""
             )

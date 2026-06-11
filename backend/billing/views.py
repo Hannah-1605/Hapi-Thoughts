@@ -10,6 +10,7 @@ from notifications.utils import notify
 
 # ── Admin — Services ──────────────────────────────────────────────────────────
 
+
 @login_required
 def admin_service_list(request):
     """Admin view — list all services in the catalog."""
@@ -94,6 +95,7 @@ def admin_service_edit(request, pk):
 
 # ── Admin — Billing Receipts ──────────────────────────────────────────────────
 
+
 @login_required
 def admin_receipt_list(request):
     """Admin view — list all billing receipts."""
@@ -101,9 +103,7 @@ def admin_receipt_list(request):
         return redirect("owner_dashboard")
 
     status_filter = request.GET.get("status", "")
-    receipts = BillingReceipt.objects.select_related(
-        "owner", "pet", "appointment"
-    )
+    receipts = BillingReceipt.objects.select_related("owner", "pet", "appointment")
 
     if status_filter:
         receipts = receipts.filter(payment_status=status_filter)
@@ -377,7 +377,7 @@ def admin_receipt_mark_paid(request, pk):
                     related_pet=receipt.pet,
                     email_subject=f"Payment Confirmed — {receipt.receipt_number}",
                 )
-                
+
             messages.success(
                 request,
                 f"Receipt {receipt.receipt_number} marked as paid.",
@@ -396,9 +396,7 @@ def admin_receipt_mark_cancelled(request, pk):
 
     if request.method == "POST":
         if receipt.is_locked:
-            messages.error(
-                request, "Paid receipts cannot be cancelled."
-            )
+            messages.error(request, "Paid receipts cannot be cancelled.")
         else:
             receipt.payment_status = BillingReceipt.CANCELLED
             receipt.save()
@@ -409,6 +407,7 @@ def admin_receipt_mark_cancelled(request, pk):
 
 # ── Pet Owner — Billing ───────────────────────────────────────────────────────
 
+
 @login_required
 def owner_billing_list(request):
     """Pet Owner view — list all their billing receipts."""
@@ -416,9 +415,7 @@ def owner_billing_list(request):
         return redirect("admin_dashboard")
 
     owner = request.user.petowner
-    receipts = BillingReceipt.objects.filter(owner=owner).order_by(
-        "-billing_date"
-    )
+    receipts = BillingReceipt.objects.filter(owner=owner).order_by("-billing_date")
 
     return render(
         request,
@@ -470,12 +467,16 @@ def admin_get_service_details(request):
     service_pk = request.GET.get("service", "")
 
     if not service_pk:
-        return JsonResponse({"name": "", "price": "", "placeholder": "", "pricing_type": ""})
+        return JsonResponse(
+            {"name": "", "price": "", "placeholder": "", "pricing_type": ""}
+        )
 
     try:
         service = Service.objects.get(pk=int(service_pk))
     except (Service.DoesNotExist, ValueError):
-        return JsonResponse({"name": "", "price": "", "placeholder": "", "pricing_type": ""})
+        return JsonResponse(
+            {"name": "", "price": "", "placeholder": "", "pricing_type": ""}
+        )
 
     data = {
         "name": service.service_name,

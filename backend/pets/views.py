@@ -33,6 +33,9 @@ from .models import (
 
 from notifications.models import NotificationPreference
 
+from medical.models import MedicalRecord, Vaccination
+
+
 def _require_pet_owner(request):
     """
     Shared guard for all pet owner views.
@@ -326,15 +329,21 @@ def owner_pet_detail(request, pk):
         return guard
 
     pet_owner = get_object_or_404(PetOwner, user=request.user)
-
-    # Ensure the pet belongs to this owner
     pet = get_object_or_404(Pet, pk=pk, owner=pet_owner, is_archived=False)
 
-    # Check for a pending deletion request on this pet
     pending_deletion = PetDeletionRequest.objects.filter(
         pet=pet,
         status=PetDeletionRequest.PENDING,
     ).first()
+
+    # Medical history — public notes only, no private_notes in context
+    medical_records = MedicalRecord.objects.filter(
+        pet=pet,
+    ).order_by("-record_date")
+
+    vaccinations = Vaccination.objects.filter(
+        pet=pet,
+    ).order_by("-date_administered")
 
     return render(
         request,
@@ -342,6 +351,8 @@ def owner_pet_detail(request, pk):
         {
             "pet": pet,
             "pending_deletion": pending_deletion,
+            "medical_records": medical_records,
+            "vaccinations": vaccinations,
         },
     )
 
@@ -836,6 +847,7 @@ def _send_claim_email_for_owner(request, user):
 # Admin — Add Pet (to existing owner)
 # ---------------------------------------------------------------------------
 
+
 @login_required
 def admin_pet_add(request, owner_pk):
     """
@@ -869,18 +881,12 @@ def admin_pet_add(request, owner_pk):
         "admin/pets/pet_form.html",
         {
             "form": form,
-            "owner": owner,        # used for cancel button and context
-            "pet": None,           # signals template this is a create, not edit
+            "owner": owner,  # used for cancel button and context
+            "pet": None,  # signals template this is a create, not edit
             "form_title": f"Add Pet for {owner.full_name}",
             "submit_label": "Add Pet",
         },
     )
-
-
-
-
-
-
 
 
 # ---------------------------------------------------------------------------

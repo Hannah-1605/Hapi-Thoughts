@@ -4,7 +4,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 from notifications.models import Notification, NotificationPreference
 
-
 # Maps notification_type to the NotificationPreference field that controls it.
 # Types not listed here always send email (e.g. admin-facing notifications).
 EMAIL_PREFERENCE_MAP = {

@@ -11,6 +11,7 @@ from .forms import NotificationPreferenceForm
 
 from django.contrib import messages
 
+
 @login_required
 def notification_panel(request):
     """
@@ -19,7 +20,9 @@ def notification_panel(request):
     """
     notifications = Notification.objects.filter(
         recipient=request.user,
-    ).order_by("-created_at")[:30]
+    ).order_by(
+        "-created_at"
+    )[:30]
 
     return render(
         request,
@@ -70,7 +73,9 @@ def notification_mark_all_read(request):
     # Reload the full panel with updated state
     notifications = Notification.objects.filter(
         recipient=request.user,
-    ).order_by("-created_at")[:30]
+    ).order_by(
+        "-created_at"
+    )[:30]
 
     return render(
         request,
@@ -107,7 +112,9 @@ def notification_clear(request):
     # Return empty panel after clearing
     notifications = Notification.objects.filter(
         recipient=request.user,
-    ).order_by("-created_at")[:30]
+    ).order_by(
+        "-created_at"
+    )[:30]
 
     return render(
         request,
@@ -142,9 +149,13 @@ def notification_open(request, pk):
     # Redirect to the relevant page based on notification type and related objects
     if notification.related_appointment:
         if request.user.is_admin:
-            return redirect("admin_appointment_detail", pk=notification.related_appointment.pk)
+            return redirect(
+                "admin_appointment_detail", pk=notification.related_appointment.pk
+            )
         else:
-            return redirect("owner_appointment_detail", pk=notification.related_appointment.pk)
+            return redirect(
+                "owner_appointment_detail", pk=notification.related_appointment.pk
+            )
 
     if notification.related_billing:
         if request.user.is_admin:

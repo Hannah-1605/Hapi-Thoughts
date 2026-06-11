@@ -176,6 +176,7 @@ class Appointment(models.Model):
     @property
     def is_upcoming(self):
         from django.utils import timezone
+
         return self.date >= timezone.now().date()
 
     @property
@@ -190,7 +191,5 @@ class Appointment(models.Model):
         appointment_datetime = timezone.make_aware(
             datetime.datetime.combine(self.date, self.time)
         )
-        hours_until = (
-            appointment_datetime - timezone.now()
-        ).total_seconds() / 3600
+        hours_until = (appointment_datetime - timezone.now()).total_seconds() / 3600
         return hours_until > 24

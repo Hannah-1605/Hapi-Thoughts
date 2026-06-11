@@ -29,18 +29,14 @@ urlpatterns = [
         views.notification_close,
         name="notification_close",
     ),
-
     path(
-    "notifications/<int:pk>/open/",
-    views.notification_open,
-    name="notification_open",
+        "notifications/<int:pk>/open/",
+        views.notification_open,
+        name="notification_open",
     ),
-
     path(
         "owner/profile/notifications/",
         views.owner_notification_preferences,
         name="owner_notification_preferences",
     ),
-
-    
 ]

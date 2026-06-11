@@ -23,7 +23,6 @@ urlpatterns = [
         views.admin_pet_medical_history,
         name="admin_pet_medical_history",
     ),
-
     # ── Admin — Prescription Items ────────────────────────────────────────
     path(
         "admin/medical/<int:record_pk>/prescription/add/",
@@ -35,7 +34,6 @@ urlpatterns = [
         views.admin_prescription_item_delete,
         name="admin_prescription_item_delete",
     ),
-
     # ── Admin — Test Result Files ─────────────────────────────────────────
     path(
         "admin/medical/<int:record_pk>/files/upload/",
@@ -47,7 +45,6 @@ urlpatterns = [
         views.admin_test_result_file_archive,
         name="admin_test_result_file_archive",
     ),
-
     # ── Admin — Vaccinations ──────────────────────────────────────────────
     path(
         "admin/medical/<int:record_pk>/vaccination/add/",
@@ -69,13 +66,11 @@ urlpatterns = [
         views.admin_pet_vaccination_history,
         name="admin_pet_vaccination_history",
     ),
-
     path(
-    "admin/medical/vaccination/<int:pk>/edit/",
-    views.admin_vaccination_edit,
-    name="admin_vaccination_edit",
+        "admin/medical/vaccination/<int:pk>/edit/",
+        views.admin_vaccination_edit,
+        name="admin_vaccination_edit",
     ),
-
     # ── Pet Owner — Medical History ───────────────────────────────────────
     path(
         "owner/pets/<int:pk>/medical/",

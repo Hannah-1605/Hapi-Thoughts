@@ -17,6 +17,7 @@ from notifications.utils import notify
 
 # ── Admin — Medical Records ───────────────────────────────────────────────────
 
+
 @login_required
 def admin_medical_record_create(request, pet_pk):
     """
@@ -34,9 +35,7 @@ def admin_medical_record_create(request, pet_pk):
 
     # Check if linking to an appointment
     appointment = None
-    appointment_pk = request.GET.get("appointment") or request.POST.get(
-        "appointment"
-    )
+    appointment_pk = request.GET.get("appointment") or request.POST.get("appointment")
     if appointment_pk:
         appointment = get_object_or_404(Appointment, pk=appointment_pk)
 
@@ -336,9 +335,7 @@ def admin_vaccination_correct(request, pk):
 
     # Redirect back to wherever we came from
     if vaccination.medical_record:
-        return redirect(
-            "admin_medical_record_detail", pk=vaccination.medical_record.pk
-        )
+        return redirect("admin_medical_record_detail", pk=vaccination.medical_record.pk)
     return redirect("admin_pet_vaccination_history", pk=vaccination.pet.pk)
 
 
@@ -390,8 +387,6 @@ def admin_pet_medical_history(request, pk):
     )
 
 
-
-
 @login_required
 def admin_vaccination_edit(request, pk):
     """
@@ -428,9 +423,7 @@ def admin_vaccination_edit(request, pk):
                     "admin_medical_record_detail",
                     pk=vaccination.medical_record.pk,
                 )
-            return redirect(
-                "admin_pet_vaccination_history", pk=vaccination.pet.pk
-            )
+            return redirect("admin_pet_vaccination_history", pk=vaccination.pet.pk)
         else:
             messages.error(request, "Please correct the errors below.")
     else:
@@ -448,11 +441,8 @@ def admin_vaccination_edit(request, pk):
     )
 
 
-
-
-
-
 # ── Pet Owner — Medical Records ───────────────────────────────────────────────
+
 
 @login_required
 def owner_pet_medical_history(request, pk):
